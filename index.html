@@ -1,0 +1,289 @@
+{% extends "base.html" %}
+
+{% block title %}BriefIQ – AI Summary & Report Generator Using Deep Learning{% endblock %}
+
+{% block content %}
+<div class="container">
+
+    <!-- Hero Section -->
+    <section class="hero-section">
+        <div class="hero-pill">
+            <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5">
+                <polygon points="12 2 15.09 8.26 22 9.27 17 14.14 18.18 21.02 12 17.77 5.82 21.02 7 14.14 2 9.27 8.91 8.26 12 2"></polygon>
+            </svg>
+            Powered by T5 Deep Learning Transformer & PyMuPDF
+        </div>
+
+        <h1 class="hero-title">
+            Distill Lengthy Documents.<br>
+            <span class="gradient-text">Generate Intelligent Reports.</span>
+        </h1>
+
+        <p class="hero-subtitle">
+            BriefIQ transforms complex PDF papers, Word documents, and Excel/CSV datasets into concise deep-learning summaries and rich visual analytical reports in seconds.
+        </p>
+
+        <!-- Main Upload Card -->
+        <div class="upload-card-wrapper">
+            <div class="upload-card">
+                <form id="uploadForm" action="{{ url_for('upload') }}" method="POST" enctype="multipart/form-data">
+                    
+                    <!-- Drag & Drop Zone -->
+                    <div class="dropzone" id="dropzone">
+                        <input
+                            type="file"
+                            name="document"
+                            id="documentInput"
+                            class="file-input-hidden"
+                            accept=".pdf,.csv,.xlsx,.xls,.docx,.doc,.txt,.md,.rtf,.tsv,.json"
+                            required
+                        >
+
+                        <div class="dropzone-icon">
+                            <svg width="28" height="28" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                                <path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4"></path>
+                                <polyline points="17 8 12 3 7 8"></polyline>
+                                <line x1="12" y1="3" x2="12" y2="15"></line>
+                            </svg>
+                        </div>
+
+                        <div class="dropzone-title">Drag & Drop any document here</div>
+                        <div class="dropzone-desc">or click anywhere to browse from your computer</div>
+
+                        <!-- Selected File Badge -->
+                        <div class="file-selected-badge" id="fileSelectedBadge">
+                            <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5">
+                                <path d="M14 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V8z"></path>
+                                <polyline points="14 2 14 8 20 8"></polyline>
+                                <line x1="16" y1="13" x2="8" y2="13"></line>
+                                <line x1="16" y1="17" x2="8" y2="17"></line>
+                                <polyline points="10 9 9 9 8 9"></polyline>
+                            </svg>
+                            <span id="selectedFileName">document.pdf</span>
+                        </div>
+
+                        <!-- Accepted Format Pills -->
+                        <div class="format-tags">
+                            <span class="format-tag">PDF</span>
+                            <span class="format-tag">CSV</span>
+                            <span class="format-tag">XLSX</span>
+                            <span class="format-tag">XLS</span>
+                            <span class="format-tag">DOCX</span>
+                            <span class="format-tag">TXT</span>
+                        </div>
+                    </div>
+
+                    <!-- Upload Controls Bar -->
+                    <div class="upload-controls">
+                        <div class="control-group">
+                            <label class="control-label" for="summaryMode">Summary Depth / Mode</label>
+                            <select name="summary_mode" id="summaryMode" class="select-control">
+                                <option value="detailed" selected>Detailed Synthesis (Recommended)</option>
+                                <option value="concise">Concise Executive Brief</option>
+                                <option value="executive">High-Density Key Takeaways</option>
+                            </select>
+                        </div>
+
+                        <div class="control-group">
+                            <label class="control-label">Analysis Pipeline</label>
+                            <div style="font-size: 13.5px; padding: 11px 14px; background: rgba(255,255,255,0.03); border: 1px solid var(--border-subtle); border-radius: var(--radius-md); color: #cbd5e1;">
+                                <span style="color: var(--accent-emerald);">●</span> Auto-Detect: NLP T5 / Pandas EDA
+                            </div>
+                        </div>
+                    </div>
+
+                    <!-- Submit Button -->
+                    <button type="submit" class="btn-analyze">
+                        <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5">
+                            <circle cx="11" cy="11" r="8"></circle>
+                            <line x1="21" y1="21" x2="16.65" y2="16.65"></line>
+                            <line x1="11" y1="8" x2="11" y2="14"></line>
+                            <line x1="8" y1="11" x2="14" y2="11"></line>
+                        </svg>
+                        Analyze Document & Generate Report
+                    </button>
+                </form>
+
+                <!-- One-Click Sample Section -->
+                <div class="samples-bar">
+                    <div class="samples-label">Or test immediately with a ready sample:</div>
+                    <div class="samples-buttons">
+                        <a href="{{ url_for('try_sample', sample_type='pdf') }}" class="btn btn-secondary btn-sm">
+                            <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="#f43f5e" stroke-width="2"><path d="M14 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V8z"></path><polyline points="14 2 14 8 20 8"></polyline></svg>
+                            Sample PDF Paper
+                        </a>
+                        <a href="{{ url_for('try_sample', sample_type='csv') }}" class="btn btn-secondary btn-sm">
+                            <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="#10b981" stroke-width="2"><rect x="3" y="3" width="18" height="18" rx="2" ry="2"></rect><line x1="3" y1="9" x2="21" y2="9"></line><line x1="9" y1="21" x2="9" y2="9"></line></svg>
+                            Sample Student CSV
+                        </a>
+                        <a href="{{ url_for('try_sample', sample_type='excel') }}" class="btn btn-secondary btn-sm">
+                            <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="#06b6d4" stroke-width="2"><rect x="3" y="3" width="18" height="18" rx="2" ry="2"></rect><line x1="3" y1="9" x2="21" y2="9"></line><line x1="3" y1="15" x2="21" y2="15"></line></svg>
+                            Sample Sales Excel
+                        </a>
+                        <a href="{{ url_for('try_sample', sample_type='docx') }}" class="btn btn-secondary btn-sm">
+                            <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="#6366f1" stroke-width="2"><path d="M14 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V8z"></path><line x1="16" y1="13" x2="8" y2="13"></line><line x1="16" y1="17" x2="8" y2="17"></line></svg>
+                            Sample Word Doc
+                        </a>
+                    </div>
+                </div>
+
+            </div>
+        </div>
+    </section>
+
+    <!-- Live Performance Stats Ribbon -->
+    <div class="stats-grid">
+        <div class="stat-card">
+            <div class="stat-icon">⚡</div>
+            <div class="stat-val">T5-Small</div>
+            <div class="stat-label">Seq2Seq Neural Model</div>
+        </div>
+        <div class="stat-card">
+            <div class="stat-icon">⏱️</div>
+            <div class="stat-val">78%</div>
+            <div class="stat-label">Reading Time Saved</div>
+        </div>
+        <div class="stat-card">
+            <div class="stat-icon">📊</div>
+            <div class="stat-val">6+</div>
+            <div class="stat-label">Supported Document Types</div>
+        </div>
+        <div class="stat-card">
+            <div class="stat-icon">📑</div>
+            <div class="stat-val">{{ stats.total_documents if stats else 12 }}</div>
+            <div class="stat-label">Documents Processed</div>
+        </div>
+    </div>
+
+    <!-- Features Showcase -->
+    <section style="margin-bottom: 70px;">
+        <div class="section-header">
+            <div class="section-tag">Core Architecture</div>
+            <h2 class="section-title">Engineered for Academic & Enterprise Rigor</h2>
+            <p style="max-width: 600px; margin: 0 auto;">Combining state-of-the-art natural language processing with automated quantitative data profiling.</p>
+        </div>
+
+        <div class="features-grid">
+            <div class="feature-card">
+                <div class="feature-icon-wrapper icon-purple">
+                    <svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                        <polygon points="12 2 2 7 12 12 22 7 12 2"></polygon>
+                        <polyline points="2 17 12 22 22 17"></polyline>
+                        <polyline points="2 12 12 17 22 12"></polyline>
+                    </svg>
+                </div>
+                <h3 class="feature-title">T5 Deep Learning Model</h3>
+                <p class="feature-desc">
+                    Employs Google's Text-to-Text Transfer Transformer (T5) trained on vast linguistic datasets to generate coherent, fluent abstractive summaries.
+                </p>
+            </div>
+
+            <div class="feature-card">
+                <div class="feature-icon-wrapper icon-blue">
+                    <svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                        <path d="M14 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V8z"></path>
+                        <polyline points="14 2 14 8 20 8"></polyline>
+                        <line x1="16" y1="13" x2="8" y2="13"></line>
+                        <line x1="16" y1="17" x2="8" y2="17"></line>
+                    </svg>
+                </div>
+                <h3 class="feature-title">PyMuPDF High-Fidelity Parser</h3>
+                <p class="feature-desc">
+                    Extracts structured text, embedded metadata, and multi-page chapters from dense academic PDFs with precision and formatting preservation.
+                </p>
+            </div>
+
+            <div class="feature-card">
+                <div class="feature-icon-wrapper icon-emerald">
+                    <svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                        <rect x="3" y="3" width="18" height="18" rx="2" ry="2"></rect>
+                        <line x1="3" y1="9" x2="21" y2="9"></line>
+                        <line x1="9" y1="21" x2="9" y2="9"></line>
+                    </svg>
+                </div>
+                <h3 class="feature-title">Automated Dataset Analytics</h3>
+                <p class="feature-desc">
+                    Leverages Pandas and openpyxl to analyze Excel and CSV spreadsheets, generating metric distributions, averages, and cohort summaries automatically.
+                </p>
+            </div>
+
+            <div class="feature-card">
+                <div class="feature-icon-wrapper icon-amber">
+                    <svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                        <circle cx="12" cy="12" r="10"></circle>
+                        <line x1="12" y1="8" x2="12" y2="12"></line>
+                        <line x1="12" y1="16" x2="12.01" y2="16"></line>
+                    </svg>
+                </div>
+                <h3 class="feature-title">Personalized Advisory Reports</h3>
+                <p class="feature-desc">
+                    For academic cohorts, BriefIQ generates individual student performance evaluations, identifying high achievers and students needing support.
+                </p>
+            </div>
+
+            <div class="feature-card">
+                <div class="feature-icon-wrapper icon-rose">
+                    <svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                        <line x1="18" y1="20" x2="18" y2="10"></line>
+                        <line x1="12" y1="20" x2="12" y2="4"></line>
+                        <line x1="6" y1="20" x2="6" y2="14"></line>
+                    </svg>
+                </div>
+                <h3 class="feature-title">Dynamic Interactive Visuals</h3>
+                <p class="feature-desc">
+                    Renders interactive Chart.js visualizations including tier distribution doughnuts, score comparisons, and attribute breakdowns.
+                </p>
+            </div>
+
+            <div class="feature-card">
+                <div class="feature-icon-wrapper icon-cyan">
+                    <svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                        <path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4"></path>
+                        <polyline points="7 10 12 15 17 10"></polyline>
+                        <line x1="12" y1="15" x2="12" y2="3"></line>
+                    </svg>
+                </div>
+                <h3 class="feature-title">Downloadable PDF Reports</h3>
+                <p class="feature-desc">
+                    Export high-resolution, branded executive PDF summaries and plain text archives ready to be shared with professors, colleagues, or teams.
+                </p>
+            </div>
+        </div>
+    </section>
+
+    <!-- Recent Analyses (if any) -->
+    {% if recent_history %}
+    <section style="margin-bottom: 70px;">
+        <div style="display: flex; align-items: center; justify-content: space-between; margin-bottom: 24px;">
+            <h3 style="font-size: 22px; font-weight: 700;">Recent Analysis Activity</h3>
+            {% if current_user %}
+                <a href="{{ url_for('profile') }}" class="btn btn-secondary btn-sm">View Full History &rarr;</a>
+            {% endif %}
+        </div>
+
+        <div style="display: grid; grid-template-columns: repeat(auto-fill, minmax(270px, 1fr)); gap: 18px;">
+            {% for item in recent_history %}
+                <div class="feature-card" style="padding: 22px;">
+                    <div style="display: flex; align-items: center; justify-content: space-between; margin-bottom: 12px;">
+                        <span class="badge-tag {% if item.analysis_type == 'dataset' %}badge-success{% else %}badge-primary{% endif %}">
+                            {{ item.file_type }}
+                        </span>
+                        <span style="font-size: 12px; color: var(--text-muted);">{{ item.created_at[:10] }}</span>
+                    </div>
+                    <h4 style="font-size: 16px; margin-bottom: 8px; white-space: nowrap; overflow: hidden; text-overflow: ellipsis;" title="{{ item.filename }}">
+                        {{ item.filename }}
+                    </h4>
+                    <p style="font-size: 13px; color: var(--text-secondary); margin-bottom: 16px;">
+                        {{ item.analysis_type.title() }} • {{ item.file_size_kb }} KB
+                    </p>
+                    <a href="{{ url_for('result_view', history_id=item.id) }}" class="btn btn-outline btn-sm" style="width: 100%;">
+                        View Results &rarr;
+                    </a>
+                </div>
+            {% endfor %}
+        </div>
+    </section>
+    {% endif %}
+
+</div>
+{% endblock %}

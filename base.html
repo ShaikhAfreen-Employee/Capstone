@@ -1,0 +1,313 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>{% block title %}BriefIQ – AI Summary & Report Generator{% endblock %}</title>
+    
+    <!-- Google Fonts -->
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&family=Outfit:wght@400;500;600;700;800&family=JetBrains+Mono:wght@400;500&display=swap" rel="stylesheet">
+    
+    <!-- Application CSS -->
+    <link rel="stylesheet" href="{{ url_for('static', filename='css/style.css') }}?v=2.2">
+
+    <!-- Chart.js for Data Visualizations -->
+    <script src="https://cdn.jsdelivr.net/npm/chart.js@4.4.1/dist/chart.umd.min.js"></script>
+
+    <!-- Immediate theme initializer to prevent flash -->
+    <script>
+        (function() {
+            const savedTheme = localStorage.getItem('briefiq_theme') || 'obsidian';
+            document.documentElement.setAttribute('data-theme', savedTheme);
+            document.addEventListener('DOMContentLoaded', () => {
+                document.body.setAttribute('data-theme', savedTheme);
+            });
+        })();
+    </script>
+
+    {% block extra_head %}{% endblock %}
+</head>
+<body>
+
+    <!-- Navigation Bar -->
+    <nav class="navbar">
+        <div class="container nav-container">
+            <a href="{{ url_for('home') }}" class="brand-logo">
+                <div class="brand-icon">
+                    <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round">
+                        <path d="M12 2v4M12 18v4M4.93 4.93l2.83 2.83M16.24 16.24l2.83 2.83M2 12h4M18 12h4M4.93 19.07l2.83-2.83M16.24 7.76l2.83-2.83"/>
+                    </svg>
+                </div>
+                <span>BriefIQ</span>
+            </a>
+
+            <ul class="nav-links">
+                <li><a href="{{ url_for('home') }}" class="nav-link {% if request.endpoint == 'home' %}active{% endif %}">Home</a></li>
+                <li><a href="{{ url_for('about') }}" class="nav-link {% if request.endpoint == 'about' %}active{% endif %}">About</a></li>
+                {% if current_user %}
+                    <li><a href="{{ url_for('profile') }}" class="nav-link {% if request.endpoint == 'profile' %}active{% endif %}">Profile & History</a></li>
+                {% endif %}
+            </ul>
+
+            <div class="nav-actions">
+                <!-- 10 Background Color Themes Dropdown -->
+                <div class="theme-picker-wrapper">
+                    <button type="button" class="btn-theme-picker" id="themePickerToggle" title="Change Background Color (10 Themes)">
+                        <span class="theme-color-dot" id="activeThemeDot"></span>
+                        <span id="activeThemeLabel">10 Colors</span>
+                        <svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5">
+                            <polyline points="6 9 12 15 18 9"></polyline>
+                        </svg>
+                    </button>
+
+                    <div class="theme-dropdown" id="themeDropdown">
+                        <div class="theme-dropdown-header">
+                            <span class="theme-dropdown-title">Background Colors</span>
+                        </div>
+
+                        <!-- Light Themes (1 to 5) -->
+                        <div class="theme-section-label">☀️ Light Colors</div>
+                        <div class="theme-grid">
+                            <button type="button" class="theme-item" data-theme-id="white">
+                                <span class="theme-swatch-circle" style="background: #ffffff; border: 1.5px solid #cbd5e1;"></span>
+                                <span class="theme-item-name">White</span>
+                            </button>
+                            <button type="button" class="theme-item" data-theme-id="light-blue">
+                                <span class="theme-swatch-circle" style="background: #bfdbfe; border: 1.5px solid #93c5fd;"></span>
+                                <span class="theme-item-name">Light Blue</span>
+                            </button>
+                            <button type="button" class="theme-item" data-theme-id="light-green">
+                                <span class="theme-swatch-circle" style="background: #bbf7d0; border: 1.5px solid #86efac;"></span>
+                                <span class="theme-item-name">Light Green</span>
+                            </button>
+                            <button type="button" class="theme-item" data-theme-id="light-gray">
+                                <span class="theme-swatch-circle" style="background: #e5e7eb; border: 1.5px solid #d1d5db;"></span>
+                                <span class="theme-item-name">Light Gray</span>
+                            </button>
+                            <button type="button" class="theme-item" data-theme-id="light-purple">
+                                <span class="theme-swatch-circle" style="background: #e9d5ff; border: 1.5px solid #d8b4fe;"></span>
+                                <span class="theme-item-name">Light Purple</span>
+                            </button>
+                        </div>
+
+                        <!-- Dark Themes (6 to 10) -->
+                        <div class="theme-section-label">🌙 Dark Colors</div>
+                        <div class="theme-grid">
+                            <button type="button" class="theme-item" data-theme-id="black">
+                                <span class="theme-swatch-circle" style="background: #090d16; border: 1.5px solid #334155;"></span>
+                                <span class="theme-item-name">Black</span>
+                            </button>
+                            <button type="button" class="theme-item" data-theme-id="dark-blue">
+                                <span class="theme-swatch-circle" style="background: #071329; border: 1.5px solid #1e3a8a;"></span>
+                                <span class="theme-item-name">Dark Blue</span>
+                            </button>
+                            <button type="button" class="theme-item" data-theme-id="dark-green">
+                                <span class="theme-swatch-circle" style="background: #041f18; border: 1.5px solid #064e3b;"></span>
+                                <span class="theme-item-name">Dark Green</span>
+                            </button>
+                            <button type="button" class="theme-item" data-theme-id="dark-red">
+                                <span class="theme-swatch-circle" style="background: #1c070c; border: 1.5px solid #881337;"></span>
+                                <span class="theme-item-name">Dark Red</span>
+                            </button>
+                            <button type="button" class="theme-item" data-theme-id="dark-gray">
+                                <span class="theme-swatch-circle" style="background: #12161f; border: 1.5px solid #334155;"></span>
+                                <span class="theme-item-name">Dark Gray</span>
+                            </button>
+                            <button type="button" class="theme-item" data-theme-id="aura" style="grid-column: span 2; background: linear-gradient(135deg, rgba(168,85,247,0.14), rgba(6,182,212,0.14)); border: 1px solid rgba(168,85,247,0.35);">
+                                <span class="theme-swatch-circle" style="background: linear-gradient(135deg, #a855f7, #06b6d4, #ec4899); box-shadow: 0 0 8px rgba(168,85,247,0.6);"></span>
+                                <span class="theme-item-name" style="font-weight: 700; color: #e9d5ff;">✨ Aura (Animated Glow)</span>
+                            </button>
+                        </div>
+                    </div>
+                </div>
+
+                {% if current_user %}
+                    <a href="{{ url_for('profile') }}" class="user-nav-pill">
+                        <div class="user-avatar-sm">{{ current_user.full_name[:1].upper() }}</div>
+                        <span style="font-weight: 600; font-size: 13.5px;">{{ current_user.full_name.split()[0] }}</span>
+                    </a>
+                    <a href="{{ url_for('logout') }}" class="btn btn-secondary btn-sm">Sign Out</a>
+                {% else %}
+                    <a href="{{ url_for('login') }}" class="btn btn-secondary btn-sm">Sign In</a>
+                    <a href="{{ url_for('register') }}" class="btn btn-primary btn-sm">Sign Up</a>
+                {% endif %}
+            </div>
+        </div>
+    </nav>
+
+    <!-- Flash Alert Container -->
+    <div class="flash-container">
+        {% with messages = get_flashed_messages(with_categories=true) %}
+            {% if messages %}
+                {% for category, message in messages %}
+                    <div class="flash-alert flash-{{ category }}">
+                        <span>{{ message }}</span>
+                        <button class="flash-close">&times;</button>
+                    </div>
+                {% endfor %}
+            {% endif %}
+        {% endwith %}
+    </div>
+
+    <!-- Main Content Block -->
+    <main style="flex: 1;">
+        {% block content %}{% endblock %}
+    </main>
+
+    <!-- Processing Loading Overlay - Centered AI Modal -->
+    <div class="loading-overlay" id="loadingOverlay" style="display: none;">
+        <div class="loading-card">
+            <!-- Animated Dual Ring Spinner with AI Chip Icon -->
+            <div class="loading-orb-container">
+                <div class="loading-spinner-ring"></div>
+                <div class="loading-spinner-ring ring-inner"></div>
+                <div class="loading-orb-icon">
+                    <svg width="26" height="26" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round">
+                        <rect x="4" y="4" width="16" height="16" rx="2"></rect>
+                        <rect x="9" y="9" width="6" height="6"></rect>
+                        <line x1="9" y1="1" x2="9" y2="4"></line>
+                        <line x1="15" y1="1" x2="15" y2="4"></line>
+                        <line x1="9" y1="20" x2="9" y2="23"></line>
+                        <line x1="15" y1="20" x2="15" y2="23"></line>
+                        <line x1="20" y1="9" x2="23" y2="9"></line>
+                        <line x1="20" y1="14" x2="23" y2="14"></line>
+                        <line x1="1" y1="9" x2="4" y2="9"></line>
+                        <line x1="1" y1="14" x2="4" y2="14"></line>
+                    </svg>
+                </div>
+            </div>
+
+            <div class="loading-title">Processing Document</div>
+            
+            <div class="loading-file-pill" id="loadingFileBadge" style="display: none;">
+                <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                    <path d="M14 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V8z"></path>
+                    <polyline points="14 2 14 8 20 8"></polyline>
+                </svg>
+                <span id="loadingFileName">Document</span>
+            </div>
+
+            <div class="loading-subtext" id="loadingSubtext">Extracting document contents and tokenizing text...</div>
+
+            <!-- Animated Progress Bar -->
+            <div class="loading-progress-box">
+                <div class="loading-progress-header">
+                    <span>Deep Learning Engine</span>
+                    <span id="loadingPercent">15%</span>
+                </div>
+                <div class="loading-progress-bar">
+                    <div class="loading-progress-fill" id="loadingProgressFill" style="width: 15%;"></div>
+                </div>
+            </div>
+
+            <!-- Step Pipeline -->
+            <div class="loading-steps-list">
+                <div class="loading-step active" id="step1">
+                    <div class="loading-step-dot"></div>
+                    <span>Extract</span>
+                </div>
+                <div class="loading-step" id="step2">
+                    <div class="loading-step-dot"></div>
+                    <span>Tokenize</span>
+                </div>
+                <div class="loading-step" id="step3">
+                    <div class="loading-step-dot"></div>
+                    <span>T5 Neural</span>
+                </div>
+                <div class="loading-step" id="step4">
+                    <div class="loading-step-dot"></div>
+                    <span>Insights</span>
+                </div>
+                <div class="loading-step" id="step5">
+                    <div class="loading-step-dot"></div>
+                    <span>Report</span>
+                </div>
+            </div>
+
+            <div class="loading-footnote">
+                <svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                    <circle cx="12" cy="12" r="10"></circle>
+                    <line x1="12" y1="16" x2="12" y2="12"></line>
+                    <line x1="12" y1="8" x2="12.01" y2="8"></line>
+                </svg>
+                Running PyTorch & Google T5 on server. Please wait...
+            </div>
+        </div>
+    </div>
+
+    <!-- Modern Footer -->
+    <footer class="footer">
+        <div class="container">
+            <div class="footer-content">
+                <div style="max-width: 400px;">
+                    <div class="brand-logo" style="margin-bottom: 10px;">
+                        <div class="brand-icon" style="width:28px; height:28px;">
+                            <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5">
+                                <path d="M12 2v4M12 18v4M4.93 4.93l2.83 2.83M16.24 16.24l2.83 2.83M2 12h4M18 12h4"/>
+                            </svg>
+                        </div>
+                        <span style="font-size: 19px;">BriefIQ</span>
+                    </div>
+                    <p style="font-size: 13.5px; color: var(--text-secondary);">
+                        Next-generation AI summary and dataset report generator powered by the Google T5 Deep Learning Transformer, PyMuPDF, and Pandas.
+                    </p>
+                </div>
+
+                <div style="display: flex; gap: 32px; flex-wrap: wrap;">
+                    <div>
+                        <div style="font-weight: 700; font-size: 13px; text-transform: uppercase; letter-spacing: 0.05em; color: var(--text-primary); margin-bottom: 12px;">Navigation</div>
+                        <div style="display: flex; flex-direction: column; gap: 8px; font-size: 13.5px;">
+                            <a href="{{ url_for('home') }}">Home Uploader</a>
+                            <a href="{{ url_for('about') }}">About BriefIQ</a>
+                            {% if current_user %}
+                                <a href="{{ url_for('profile') }}">My Profile</a>
+                            {% else %}
+                                <a href="{{ url_for('login') }}">Sign In</a>
+                                <a href="{{ url_for('register') }}">Create Account</a>
+                            {% endif %}
+                        </div>
+                    </div>
+                    <div>
+                        <div style="font-weight: 700; font-size: 13px; text-transform: uppercase; letter-spacing: 0.05em; color: var(--text-primary); margin-bottom: 12px;">Supported Formats</div>
+                        <div style="display: flex; flex-direction: column; gap: 8px; font-size: 13.5px; color: var(--text-muted);">
+                            <span>PDF Documents (.pdf)</span>
+                            <span>Excel Spreadsheets (.xlsx, .xls)</span>
+                            <span>CSV & TSV Datasets (.csv, .tsv)</span>
+                            <span>Word & Text (.docx, .txt, .md)</span>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            <div class="footer-copy">
+                &copy; 2026 BriefIQ • AI Summary & Report Generator Using Deep Learning • Capstone Project
+            </div>
+        </div>
+    </footer>
+
+    <!-- Floating Quick 10-Color Background Dock -->
+    <div class="floating-theme-bar" id="floatingThemeBar" title="Click any color to switch background">
+        <span class="floating-bar-label">☀️ Light:</span>
+        <span class="floating-swatch" data-theme-id="white" style="background: #ffffff; border: 1.5px solid #cbd5e1;" title="White"></span>
+        <span class="floating-swatch" data-theme-id="light-blue" style="background: #bfdbfe; border: 1.5px solid #93c5fd;" title="Light Blue"></span>
+        <span class="floating-swatch" data-theme-id="light-green" style="background: #bbf7d0; border: 1.5px solid #86efac;" title="Light Green"></span>
+        <span class="floating-swatch" data-theme-id="light-gray" style="background: #e5e7eb; border: 1.5px solid #d1d5db;" title="Light Gray"></span>
+        <span class="floating-swatch" data-theme-id="light-purple" style="background: #e9d5ff; border: 1.5px solid #d8b4fe;" title="Light Purple"></span>
+        <span style="width: 1px; height: 16px; background: rgba(128,128,128,0.3); margin: 0 4px;"></span>
+        <span class="floating-bar-label">🌙 Dark:</span>
+        <span class="floating-swatch" data-theme-id="black" style="background: #090d16; border: 1.5px solid #334155;" title="Black"></span>
+        <span class="floating-swatch" data-theme-id="dark-blue" style="background: #071329; border: 1.5px solid #1e3a8a;" title="Dark Blue"></span>
+        <span class="floating-swatch" data-theme-id="dark-green" style="background: #041f18; border: 1.5px solid #064e3b;" title="Dark Green"></span>
+        <span class="floating-swatch" data-theme-id="dark-red" style="background: #1c070c; border: 1.5px solid #881337;" title="Dark Red"></span>
+        <span class="floating-swatch" data-theme-id="dark-gray" style="background: #12161f; border: 1.5px solid #334155;" title="Dark Gray"></span>
+        <span style="width: 1px; height: 16px; background: rgba(128,128,128,0.3); margin: 0 4px;"></span>
+        <span class="floating-swatch" data-theme-id="aura" style="background: linear-gradient(135deg, #a855f7, #06b6d4, #ec4899); box-shadow: 0 0 8px rgba(168,85,247,0.8);" title="✨ Aura (Animated Glow)"></span>
+    </div>
+
+    <!-- Scripts -->
+    <script src="{{ url_for('static', filename='js/main.js') }}?v=2.2"></script>
+    {% block extra_scripts %}{% endblock %}
+</body>
+</html>

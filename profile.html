@@ -1,0 +1,239 @@
+{% extends "base.html" %}
+
+{% block title %}User Profile & Analysis History – BriefIQ{% endblock %}
+
+{% block content %}
+<div class="container" style="padding-top: 30px; padding-bottom: 70px;">
+
+    <!-- Profile Header / Overview -->
+    <div class="profile-grid">
+        
+        <!-- Left: Profile Identity Card -->
+        <div class="profile-card">
+            <div class="profile-avatar-lg">
+                {{ user.full_name[:1].upper() if user else 'U' }}
+            </div>
+            <h2 class="profile-name">{{ user.full_name if user else 'Researcher' }}</h2>
+            <div class="profile-role-badge">
+                {{ user.role if user else 'Scholar' }}
+            </div>
+
+            <div style="font-size: 13.5px; color: var(--text-secondary); margin-bottom: 24px; text-align: left; padding: 14px; background: rgba(255,255,255,0.02); border-radius: var(--radius-md); border: 1px solid var(--border-subtle);">
+                <div style="margin-bottom: 8px;">
+                    <b style="color: var(--text-primary);">Username:</b> @{{ user.username if user else 'user' }}
+                </div>
+                <div style="margin-bottom: 8px;">
+                    <b style="color: var(--text-primary);">Email:</b> {{ user.email if user else 'user@briefiq.ai' }}
+                </div>
+                <div>
+                    <b style="color: var(--text-primary);">Joined:</b> {{ user.created_at[:10] if user and user.created_at else '2026' }}
+                </div>
+            </div>
+
+            <!-- Profile Edit Form -->
+            <form action="{{ url_for('profile') }}" method="POST" style="text-align: left;">
+                <div class="form-group" style="margin-bottom: 14px;">
+                    <label class="form-label" for="edit_name">Update Display Name</label>
+                    <input
+                        type="text"
+                        id="edit_name"
+                        name="full_name"
+                        class="form-input"
+                        value="{{ user.full_name if user else '' }}"
+                        required
+                    >
+                </div>
+
+                <div class="form-group" style="margin-bottom: 18px;">
+                    <label class="form-label" for="edit_role">Designation / Role</label>
+                    <select id="edit_role" name="role" class="select-control">
+                        <option value="Student" {% if user and user.role == 'Student' %}selected{% endif %}>Student</option>
+                        <option value="Researcher" {% if user and user.role == 'Researcher' %}selected{% endif %}>Researcher</option>
+                        <option value="Teacher" {% if user and user.role == 'Teacher' %}selected{% endif %}>Teacher / Educator</option>
+                        <option value="Professional" {% if user and user.role == 'Professional' %}selected{% endif %}>Enterprise Professional</option>
+                    </select>
+                </div>
+
+                <button type="submit" class="btn btn-secondary btn-sm" style="width: 100%;">
+                    Save Profile Changes
+                </button>
+            </form>
+
+            <!-- 10 Normal Background Color Themes Setting -->
+            <div style="margin-top: 24px; padding: 18px 14px; background: rgba(255,255,255,0.02); border-radius: var(--radius-md); border: 1px solid var(--border-subtle); text-align: left;">
+                <div style="font-size: 13px; font-weight: 700; text-transform: uppercase; letter-spacing: 0.05em; color: var(--text-primary); margin-bottom: 6px;">
+                    🎨 Background Colors (10 Themes)
+                </div>
+                <p style="font-size: 12px; color: var(--text-muted); margin-bottom: 10px;">
+                    Select your preferred Light or Dark workspace background:
+                </p>
+
+                <!-- Light Themes -->
+                <div style="font-size: 11px; font-weight: 700; color: var(--text-secondary); margin-bottom: 6px;">☀️ Light Themes</div>
+                <div style="display: grid; grid-template-columns: repeat(2, 1fr); gap: 6px; margin-bottom: 12px;">
+                    <button type="button" class="theme-item" data-theme-id="white" style="padding: 6px 8px;">
+                        <span class="theme-swatch-circle" style="background: #ffffff; border: 1.5px solid #cbd5e1; width: 14px; height: 14px;"></span>
+                        <span class="theme-item-name" style="font-size: 11px;">White</span>
+                    </button>
+                    <button type="button" class="theme-item" data-theme-id="light-blue" style="padding: 6px 8px;">
+                        <span class="theme-swatch-circle" style="background: #bfdbfe; border: 1.5px solid #93c5fd; width: 14px; height: 14px;"></span>
+                        <span class="theme-item-name" style="font-size: 11px;">Light Blue</span>
+                    </button>
+                    <button type="button" class="theme-item" data-theme-id="light-green" style="padding: 6px 8px;">
+                        <span class="theme-swatch-circle" style="background: #bbf7d0; border: 1.5px solid #86efac; width: 14px; height: 14px;"></span>
+                        <span class="theme-item-name" style="font-size: 11px;">Light Green</span>
+                    </button>
+                    <button type="button" class="theme-item" data-theme-id="light-gray" style="padding: 6px 8px;">
+                        <span class="theme-swatch-circle" style="background: #e5e7eb; border: 1.5px solid #d1d5db; width: 14px; height: 14px;"></span>
+                        <span class="theme-item-name" style="font-size: 11px;">Light Gray</span>
+                    </button>
+                    <button type="button" class="theme-item" data-theme-id="light-purple" style="padding: 6px 8px; grid-column: span 2;">
+                        <span class="theme-swatch-circle" style="background: #e9d5ff; border: 1.5px solid #d8b4fe; width: 14px; height: 14px;"></span>
+                        <span class="theme-item-name" style="font-size: 11px;">Light Purple</span>
+                    </button>
+                </div>
+
+                <!-- Dark Themes -->
+                <div style="font-size: 11px; font-weight: 700; color: var(--text-secondary); margin-bottom: 6px;">🌙 Dark Themes</div>
+                <div style="display: grid; grid-template-columns: repeat(2, 1fr); gap: 6px; margin-bottom: 12px;">
+                    <button type="button" class="theme-item" data-theme-id="black" style="padding: 6px 8px;">
+                        <span class="theme-swatch-circle" style="background: #090d16; border: 1.5px solid #334155; width: 14px; height: 14px;"></span>
+                        <span class="theme-item-name" style="font-size: 11px;">Black</span>
+                    </button>
+                    <button type="button" class="theme-item" data-theme-id="dark-blue" style="padding: 6px 8px;">
+                        <span class="theme-swatch-circle" style="background: #071329; border: 1.5px solid #1e3a8a; width: 14px; height: 14px;"></span>
+                        <span class="theme-item-name" style="font-size: 11px;">Dark Blue</span>
+                    </button>
+                    <button type="button" class="theme-item" data-theme-id="dark-green" style="padding: 6px 8px;">
+                        <span class="theme-swatch-circle" style="background: #041f18; border: 1.5px solid #064e3b; width: 14px; height: 14px;"></span>
+                        <span class="theme-item-name" style="font-size: 11px;">Dark Green</span>
+                    </button>
+                    <button type="button" class="theme-item" data-theme-id="dark-red" style="padding: 6px 8px;">
+                        <span class="theme-swatch-circle" style="background: #1c070c; border: 1.5px solid #881337; width: 14px; height: 14px;"></span>
+                        <span class="theme-item-name" style="font-size: 11px;">Dark Red</span>
+                    </button>
+                    <button type="button" class="theme-item" data-theme-id="dark-gray" style="padding: 6px 8px; grid-column: span 2;">
+                        <span class="theme-swatch-circle" style="background: #12161f; border: 1.5px solid #334155; width: 14px; height: 14px;"></span>
+                        <span class="theme-item-name" style="font-size: 11px;">Dark Gray</span>
+                    </button>
+                </div>
+
+                <!-- Special Aura Theme -->
+                <div style="font-size: 11px; font-weight: 700; color: #c084fc; margin-bottom: 6px;">✨ Aura Effect</div>
+                <button type="button" class="theme-item" data-theme-id="aura" style="width: 100%; padding: 8px 10px; background: linear-gradient(135deg, rgba(168,85,247,0.18), rgba(6,182,212,0.18)); border: 1px solid rgba(168,85,247,0.45); display: flex; align-items: center; gap: 8px; border-radius: var(--radius-sm); cursor: pointer;">
+                    <span class="theme-swatch-circle" style="background: linear-gradient(135deg, #a855f7, #06b6d4, #ec4899); box-shadow: 0 0 10px rgba(168,85,247,0.8); width: 14px; height: 14px;"></span>
+                    <span class="theme-item-name" style="font-size: 11px; font-weight: 700; color: #e9d5ff;">✨ Aura (Animated Iridescent Glow)</span>
+                </button>
+            </div>
+        </div>
+
+        <!-- Right: Stats & Document History -->
+        <div>
+            <!-- Stats Ribbon -->
+            <div style="display: grid; grid-template-columns: repeat(4, 1fr); gap: 14px; margin-bottom: 24px;">
+                <div class="stat-card" style="padding: 18px 14px;">
+                    <div class="stat-val" style="font-size: 26px; color: var(--accent-cyan);">{{ stats.total_documents }}</div>
+                    <div class="stat-label" style="font-size: 12px;">Total Docs</div>
+                </div>
+                <div class="stat-card" style="padding: 18px 14px;">
+                    <div class="stat-val" style="font-size: 26px; color: var(--primary);">{{ stats.total_summaries }}</div>
+                    <div class="stat-label" style="font-size: 12px;">PDF / Text Summaries</div>
+                </div>
+                <div class="stat-card" style="padding: 18px 14px;">
+                    <div class="stat-val" style="font-size: 26px; color: var(--accent-emerald);">{{ stats.total_reports }}</div>
+                    <div class="stat-label" style="font-size: 12px;">Dataset Reports</div>
+                </div>
+                <div class="stat-card" style="padding: 18px 14px;">
+                    <div class="stat-val" style="font-size: 26px; color: var(--accent-purple);">{{ stats.time_saved_hours }}h</div>
+                    <div class="stat-label" style="font-size: 12px;">Hours Saved</div>
+                </div>
+            </div>
+
+            <!-- History Card -->
+            <div class="history-card">
+                <div class="history-header">
+                    <div>
+                        <h3 style="font-size: 20px; font-weight: 700;">Document Analysis History</h3>
+                        <p style="font-size: 13px; color: var(--text-muted);">Access, re-view, or download all previously processed reports.</p>
+                    </div>
+                    <a href="{{ url_for('home') }}" class="btn btn-primary btn-sm">
+                        + New Document
+                    </a>
+                </div>
+
+                {% if history %}
+                    <div class="table-wrapper">
+                        <table class="modern-table">
+                            <thead>
+                                <tr>
+                                    <th>Document</th>
+                                    <th>Format</th>
+                                    <th>Type</th>
+                                    <th>Date</th>
+                                    <th style="text-align: right;">Actions</th>
+                                </tr>
+                            </thead>
+                            <tbody>
+                                {% for item in history %}
+                                    <tr>
+                                        <td>
+                                            <div style="font-weight: 600; color: var(--text-primary); max-width: 220px; overflow: hidden; text-overflow: ellipsis; white-space: nowrap;" title="{{ item.filename }}">
+                                                {{ item.filename }}
+                                            </div>
+                                            <div style="font-size: 11px; color: var(--text-muted);">{{ item.file_size_kb }} KB</div>
+                                        </td>
+                                        <td>
+                                            <span class="badge-tag" style="font-size: 11px;">
+                                                {{ item.file_type }}
+                                            </span>
+                                        </td>
+                                        <td>
+                                            <span class="badge-tag {% if item.analysis_type == 'dataset' %}badge-success{% else %}badge-primary{% endif %}" style="font-size: 11px;">
+                                                {{ item.analysis_type.title() }}
+                                            </span>
+                                        </td>
+                                        <td style="font-size: 12px; color: var(--text-secondary);">
+                                            {{ item.created_at[:10] }}
+                                        </td>
+                                        <td style="text-align: right;">
+                                            <div style="display: inline-flex; gap: 6px;">
+                                                <a href="{{ url_for('result_view', history_id=item.id) }}" class="btn btn-secondary btn-sm" title="View Results">
+                                                    View
+                                                </a>
+                                                <a href="{{ url_for('download_pdf_report', history_id=item.id) }}" class="btn btn-outline btn-sm" title="Download PDF">
+                                                    PDF
+                                                </a>
+                                                <form action="{{ url_for('delete_history', history_id=item.id) }}" method="POST" onsubmit="return confirm('Remove this document from history?');" style="display:inline;">
+                                                    <button type="submit" class="btn btn-danger btn-sm" title="Delete" style="padding: 7px 10px;">
+                                                        &times;
+                                                    </button>
+                                                </form>
+                                            </div>
+                                        </td>
+                                    </tr>
+                                {% endfor %}
+                            </tbody>
+                        </table>
+                    </div>
+                {% else %}
+                    <div style="text-align: center; padding: 48px 20px; background: rgba(255,255,255,0.02); border-radius: var(--radius-md); border: 1px dashed var(--border-subtle);">
+                        <svg width="40" height="40" viewBox="0 0 24 24" fill="none" stroke="var(--text-muted)" stroke-width="1.5" style="margin-bottom: 12px;">
+                            <path d="M14 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V8z"></path>
+                            <polyline points="14 2 14 8 20 8"></polyline>
+                        </svg>
+                        <div style="font-weight: 700; font-size: 16px; margin-bottom: 6px;">No Documents Processed Yet</div>
+                        <p style="font-size: 13.5px; color: var(--text-secondary); max-width: 380px; margin: 0 auto 18px;">
+                            Upload your first PDF document or CSV/Excel spreadsheet to generate an AI summary or report.
+                        </p>
+                        <a href="{{ url_for('home') }}" class="btn btn-primary btn-sm">
+                            Upload Document Now
+                        </a>
+                    </div>
+                {% endif %}
+            </div>
+        </div>
+
+    </div>
+
+</div>
+{% endblock %}

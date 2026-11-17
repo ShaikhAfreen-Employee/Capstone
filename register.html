@@ -1,0 +1,108 @@
+{% extends "base.html" %}
+
+{% block title %}Create Account – BriefIQ Intelligence Platform{% endblock %}
+
+{% block content %}
+<div class="auth-wrapper">
+    <div class="auth-card" style="max-width: 500px;">
+        <div class="auth-header">
+            <div class="brand-icon" style="margin: 0 auto 16px; width: 44px; height: 44px;">
+                <svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5">
+                    <path d="M16 21v-2a4 4 0 0 0-4-4H5a4 4 0 0 0-4 4v2"></path>
+                    <circle cx="8.5" cy="7" r="4"></circle>
+                    <line x1="20" y1="8" x2="20" y2="14"></line>
+                    <line x1="23" y1="11" x2="17" y2="11"></line>
+                </svg>
+            </div>
+            <h1 class="auth-title">Create BriefIQ Account</h1>
+            <p class="auth-subtitle">Join researchers and analysts accelerating their knowledge workflows</p>
+        </div>
+
+        <form action="{{ url_for('register') }}" method="POST">
+            <div class="form-group">
+                <label class="form-label" for="full_name">Full Name *</label>
+                <input
+                    type="text"
+                    id="full_name"
+                    name="full_name"
+                    class="form-input"
+                    placeholder="e.g. Dr. Alex Morgan"
+                    required
+                >
+            </div>
+
+            <div style="display: grid; grid-template-columns: 1fr 1fr; gap: 14px;">
+                <div class="form-group">
+                    <label class="form-label" for="username">Username *</label>
+                    <input
+                        type="text"
+                        id="username"
+                        name="username"
+                        class="form-input"
+                        placeholder="e.g. alex_m"
+                        required
+                    >
+                </div>
+
+                <div class="form-group">
+                    <label class="form-label" for="role">User Role *</label>
+                    <select id="role" name="role" class="select-control" style="padding: 12px 14px;">
+                        <option value="Student">Student</option>
+                        <option value="Researcher" selected>Researcher</option>
+                        <option value="Teacher">Teacher / Educator</option>
+                        <option value="Professional">Enterprise Professional</option>
+                    </select>
+                </div>
+            </div>
+
+            <div class="form-group">
+                <label class="form-label" for="email">Email Address *</label>
+                <input
+                    type="email"
+                    id="email"
+                    name="email"
+                    class="form-input"
+                    placeholder="alex@university.edu"
+                    required
+                >
+            </div>
+
+            <div style="display: grid; grid-template-columns: 1fr 1fr; gap: 14px;">
+                <div class="form-group">
+                    <label class="form-label" for="password">Password *</label>
+                    <input
+                        type="password"
+                        id="password"
+                        name="password"
+                        class="form-input"
+                        placeholder="Min 6 characters"
+                        required
+                    >
+                </div>
+
+                <div class="form-group">
+                    <label class="form-label" for="confirm_password">Confirm Password *</label>
+                    <input
+                        type="password"
+                        id="confirm_password"
+                        name="confirm_password"
+                        class="form-input"
+                        placeholder="Repeat password"
+                        required
+                    >
+                </div>
+            </div>
+
+            <button type="submit" class="btn btn-primary" style="width: 100%; padding: 14px; margin-top: 10px;">
+                Create Free Account &rarr;
+            </button>
+        </form>
+
+
+        <div class="auth-footer">
+            Already have an account?
+            <a href="{{ url_for('login') }}" style="font-weight: 600; color: var(--accent-cyan);">Sign in here</a>
+        </div>
+    </div>
+</div>
+{% endblock %}

@@ -1,0 +1,554 @@
+{% extends "base.html" %}
+
+{% block title %}BriefIQ – Analysis Result: {{ analysis.filename if analysis else 'Report' }}{% endblock %}
+
+{% block content %}
+<div class="container" style="padding-top: 30px; padding-bottom: 60px;">
+
+    <!-- Result Header Card -->
+    <div class="result-header">
+        <div class="result-meta-row">
+            <div class="result-title-group">
+                <div class="result-badges" style="margin-bottom: 8px;">
+                    <span class="badge-tag {% if is_table %}badge-success{% else %}badge-primary{% endif %}">
+                        {{ analysis.file_type if analysis else 'Document' }}
+                    </span>
+                    <span class="badge-tag">
+                        <svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><circle cx="12" cy="12" r="10"></circle><polyline points="12 6 12 12 16 14"></polyline></svg>
+                        {{ analysis.created_at[:16] if analysis and analysis.created_at else 'Just now' }}
+                    </span>
+                    {% if analysis and analysis.file_size_kb %}
+                        <span class="badge-tag">{{ analysis.file_size_kb }} KB</span>
+                    {% endif %}
+                </div>
+                <h1>{{ analysis.filename if analysis else 'Document Analysis' }}</h1>
+            </div>
+
+            <!-- Header Actions -->
+            <div class="result-actions">
+                {% if analysis %}
+                    <a href="{{ url_for('download_pdf_report', history_id=analysis.id) }}" class="btn btn-primary btn-sm">
+                        <svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4"></path><polyline points="7 10 12 15 17 10"></polyline><line x1="12" y1="15" x2="12" y2="3"></line></svg>
+                        Download PDF Report
+                    </a>
+                    <a href="{{ url_for('download_txt_report', history_id=analysis.id) }}" class="btn btn-secondary btn-sm">
+                        <svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M14 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V8z"></path><line x1="16" y1="13" x2="8" y2="13"></line><line x1="16" y1="17" x2="8" y2="17"></line></svg>
+                        Text Export
+                    </a>
+                {% endif %}
+                <button type="button" id="copySummaryBtn" class="btn btn-secondary btn-sm">
+                    <svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><rect x="9" y="9" width="13" height="13" rx="2" ry="2"></rect><path d="M5 15H4a2 2 0 0 1-2-2V4a2 2 0 0 1 2-2h9a2 2 0 0 1 2 2v1"></path></svg>
+                    Copy Summary
+                </button>
+                <a href="{{ url_for('home') }}" class="btn btn-secondary btn-sm">
+                    Upload Another
+                </a>
+            </div>
+        </div>
+
+        <!-- Metrics Ribbon -->
+        <div class="kpi-row">
+            {% if is_table %}
+                <div class="kpi-chip">
+                    <div class="kpi-chip-title">Total Records</div>
+                    <div class="kpi-chip-val" style="color: var(--accent-cyan);">{{ kpis.total_records }}</div>
+                </div>
+                <div class="kpi-chip">
+                    <div class="kpi-chip-title">Attributes / Cols</div>
+                    <div class="kpi-chip-val">{{ kpis.total_columns }}</div>
+                </div>
+                {% if kpis.avg_score %}
+                    <div class="kpi-chip">
+                        <div class="kpi-chip-title">Cohort Avg Score</div>
+                        <div class="kpi-chip-val" style="color: var(--accent-emerald);">{{ kpis.avg_score }}</div>
+                    </div>
+                {% endif %}
+                {% if kpis.avg_attendance %}
+                    <div class="kpi-chip">
+                        <div class="kpi-chip-title">Cohort Attendance</div>
+                        <div class="kpi-chip-val" style="color: var(--primary);">{{ kpis.avg_attendance }}</div>
+                    </div>
+                {% elif kpis.primary_metric %}
+                    <div class="kpi-chip">
+                        <div class="kpi-chip-title">Primary Metric</div>
+                        <div class="kpi-chip-val" style="font-size: 18px;">{{ kpis.primary_metric }}</div>
+                    </div>
+                {% endif %}
+                <div class="kpi-chip">
+                    <div class="kpi-chip-title">Data Health</div>
+                    <div class="kpi-chip-val" style="font-size: 18px; color: {% if kpis.missing_values == 0 %}var(--accent-emerald){% else %}var(--accent-amber){% endif %};">
+                        {% if kpis.missing_values == 0 %}100% Clean{% else %}{{ kpis.missing_values }} Missing{% endif %}
+                    </div>
+                </div>
+            {% else %}
+                <div class="kpi-chip">
+                    <div class="kpi-chip-title">Original Words</div>
+                    <div class="kpi-chip-val">{{ kpis.original_word_count if kpis.original_word_count else '350+' }}</div>
+                </div>
+                <div class="kpi-chip">
+                    <div class="kpi-chip-title">Summary Words</div>
+                    <div class="kpi-chip-val" style="color: var(--accent-cyan);">{{ kpis.summary_word_count if kpis.summary_word_count else '75' }}</div>
+                </div>
+                <div class="kpi-chip">
+                    <div class="kpi-chip-title">Compression</div>
+                    <div class="kpi-chip-val" style="color: var(--accent-emerald);">
+                        {{ kpis.reduction_percentage if kpis.reduction_percentage else '78' }}%
+                    </div>
+                </div>
+                <div class="kpi-chip">
+                    <div class="kpi-chip-title">Time Saved</div>
+                    <div class="kpi-chip-val" style="color: var(--accent-purple);">
+                        ~{{ kpis.time_saved_mins if kpis.time_saved_mins else '4' }} mins
+                    </div>
+                </div>
+                <div class="kpi-chip">
+                    <div class="kpi-chip-title">Neural Engine</div>
+                    <div class="kpi-chip-val" style="font-size: 16px; color: var(--primary);">Google T5</div>
+                </div>
+            {% endif %}
+        </div>
+    </div>
+
+    <!-- Executive Summary Card -->
+    <div class="summary-card">
+        <div class="summary-card-header">
+            <div class="summary-card-title">
+                <svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="var(--primary)" stroke-width="2.5">
+                    <polygon points="12 2 15.09 8.26 22 9.27 17 14.14 18.18 21.02 12 17.77 5.82 21.02 7 14.14 2 9.27 8.91 8.26 12 2"></polygon>
+                </svg>
+                <span>{% if is_table %}Overall Analytical Cohort Summary{% else %}Deep Learning Abstractive Summary{% endif %}</span>
+            </div>
+            <span class="badge-tag badge-primary">T5-small Neural Synthesis</span>
+        </div>
+
+        <div class="summary-text" id="summaryContentText">
+            {{ ai_summary }}
+        </div>
+    </div>
+
+    {% if not is_table and takeaways %}
+        <!-- Key Takeaways Bullets -->
+        <div class="takeaways-card">
+            <div class="summary-card-title" style="margin-bottom: 6px;">
+                <svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="var(--accent-emerald)" stroke-width="2.5">
+                    <polyline points="9 11 12 14 22 4"></polyline>
+                    <path d="M21 12v7a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2V5a2 2 0 0 1 2-2h11"></path>
+                </svg>
+                <span>Key Thematic Takeaways</span>
+            </div>
+            <p style="font-size: 13.5px;">Synthesized high-salience points extracted from the source document.</p>
+
+            <ul class="takeaways-list">
+                {% for item in takeaways %}
+                    <li class="takeaway-item">
+                        <div class="takeaway-icon">
+                            <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5">
+                                <polyline points="20 6 9 17 4 12"></polyline>
+                            </svg>
+                        </div>
+                        <div>{{ item }}</div>
+                    </li>
+                {% endfor %}
+            </ul>
+        </div>
+    {% endif %}
+
+    {% if is_table %}
+        <!-- Dynamic Chart.js Visualizations -->
+        {% if chart_data and (chart_data.distribution or chart_data.comparison) %}
+            <div class="charts-grid">
+                {% if chart_data.distribution %}
+                    <div class="chart-card">
+                        <div class="chart-header">
+                            📊 {{ chart_data.distribution.title }}
+                        </div>
+                        <div class="chart-container">
+                            <canvas id="distributionChart"></canvas>
+                        </div>
+                    </div>
+                {% endif %}
+
+                {% if chart_data.comparison %}
+                    <div class="chart-card">
+                        <div class="chart-header">
+                            📈 {{ chart_data.comparison.title }}
+                        </div>
+                        <div class="chart-container">
+                            <canvas id="comparisonChart"></canvas>
+                        </div>
+                    </div>
+                {% endif %}
+            </div>
+        {% endif %}
+
+        <!-- Individual Student Summaries / Advisory Cards -->
+        {% if individual_summaries %}
+            <div style="margin-bottom: 20px;">
+                <div style="display: flex; align-items: center; justify-content: space-between; margin-bottom: 16px;">
+                    <div>
+                        <h3 style="font-size: 22px; font-weight: 700;">Individual Performance & Advisory Assessments</h3>
+                        <p style="font-size: 13.5px;">Personalized academic advisory generated by BriefIQ's diagnostic engine.</p>
+                    </div>
+                    <span class="badge-tag">{{ individual_summaries|length }} Evaluated</span>
+                </div>
+
+                <div class="students-grid">
+                    {% for student in individual_summaries %}
+                        <div class="student-card">
+                            <div class="student-header">
+                                <span class="student-name">{{ student.name }}</span>
+                                {% set perf_lower = student.performance|lower %}
+                                <span class="perf-badge {% if 'excellent' in perf_lower %}perf-excellent{% elif 'very good' in perf_lower or 'good' in perf_lower %}perf-good{% elif 'average' in perf_lower %}perf-average{% else %}perf-improvement{% endif %}">
+                                    {{ student.performance }}
+                                </span>
+                            </div>
+
+                            <div class="student-stat-row">
+                                <div><b>Score:</b> {{ student.score }}</div>
+                                {% if student.attendance and student.attendance != 'N/A' %}
+                                    <div><b>Attendance:</b> {{ student.attendance }}</div>
+                                {% endif %}
+                            </div>
+
+                            <div class="student-report-text">
+                                {{ student.report }}
+                            </div>
+                        </div>
+                    {% endfor %}
+                </div>
+            </div>
+        {% endif %}
+
+        <!-- Detailed Table -->
+        <div class="table-card">
+            <div class="table-toolbar">
+                <div>
+                    <h3 style="font-size: 20px; font-weight: 700;">Full Tabular Dataset Preview</h3>
+                    <p style="font-size: 13px; color: var(--text-muted);">Displaying {{ rows|length }} records parsed from {{ analysis.filename if analysis else 'file' }}.</p>
+                </div>
+                <input
+                    type="text"
+                    id="tableSearchInput"
+                    class="table-search-input"
+                    placeholder="Search any record or value..."
+                >
+            </div>
+
+            <div class="table-wrapper">
+                <table class="modern-table" id="modernDataTable">
+                    <thead>
+                        <tr>
+                            <th style="width: 50px;">#</th>
+                            {% for col in columns %}
+                                <th>{{ col }}</th>
+                            {% endfor %}
+                        </tr>
+                    </thead>
+                    <tbody>
+                        {% for row in rows %}
+                            <tr>
+                                <td style="color: var(--text-muted); font-size: 12px;">{{ loop.index }}</td>
+                                {% for val in row %}
+                                    <td>{{ val }}</td>
+                                {% endfor %}
+                            </tr>
+                        {% endfor %}
+                    </tbody>
+                </table>
+            </div>
+        </div>
+    {% endif %}
+
+    <!-- ============================================================
+         Chat with Document — Floating Widget
+    ============================================================ -->
+    {% if analysis %}
+    <div class="chat-fab" id="chatFab" title="Chat with this document">
+        <svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2">
+            <path d="M21 15a2 2 0 0 1-2 2H7l-4 4V5a2 2 0 0 1 2-2h14a2 2 0 0 1 2 2z"></path>
+        </svg>
+        <span class="chat-fab-label">Ask AI</span>
+        <span class="chat-fab-ping"></span>
+    </div>
+
+    <div class="chat-panel" id="chatPanel">
+        <div class="chat-panel-header">
+            <div class="chat-panel-title">
+                <div class="chat-panel-avatar">
+                    <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5">
+                        <polygon points="12 2 15.09 8.26 22 9.27 17 14.14 18.18 21.02 12 17.77 5.82 21.02 7 14.14 2 9.27 8.91 8.26 12 2"></polygon>
+                    </svg>
+                </div>
+                <div>
+                    <div style="font-weight: 700; font-size: 14px;">BriefIQ Assistant</div>
+                    <div style="font-size: 11px; color: var(--accent-emerald);">● Online · Powered by T5</div>
+                </div>
+            </div>
+            <button class="chat-close-btn" id="chatCloseBtn" title="Close">
+                <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5">
+                    <line x1="18" y1="6" x2="6" y2="18"></line>
+                    <line x1="6" y1="6" x2="18" y2="18"></line>
+                </svg>
+            </button>
+        </div>
+
+        <div class="chat-messages" id="chatMessages">
+            <!-- Welcome message -->
+            <div class="chat-msg chat-msg-bot">
+                <div class="chat-bubble chat-bubble-bot">
+                    👋 Hi! I'm your document assistant. Ask me anything about <strong>{{ analysis.filename }}</strong> and I'll find the answer from its summary.
+                </div>
+                <div class="chat-time">BriefIQ AI · just now</div>
+            </div>
+
+            <!-- Suggested questions chips -->
+            <div class="chat-suggestions" id="chatSuggestions">
+                <div class="chat-suggestion-label">Try asking:</div>
+                <div class="chat-suggestion-chips">
+                    {% if is_table %}
+                        <button class="chat-chip" data-q="What is the average score?">What is the average score?</button>
+                        <button class="chat-chip" data-q="Who are the top performers?">Who are the top performers?</button>
+                        <button class="chat-chip" data-q="What does the data show?">What does the data show?</button>
+                        <button class="chat-chip" data-q="How many records are there?">How many records?</button>
+                    {% else %}
+                        <button class="chat-chip" data-q="What is this document about?">What is this document about?</button>
+                        <button class="chat-chip" data-q="What are the key findings?">What are the key findings?</button>
+                        <button class="chat-chip" data-q="What is the main conclusion?">What is the main conclusion?</button>
+                        <button class="chat-chip" data-q="Summarize the main topic">Summarize the main topic</button>
+                    {% endif %}
+                </div>
+            </div>
+        </div>
+
+        <div class="chat-input-bar">
+            <input
+                type="text"
+                id="chatInput"
+                class="chat-input"
+                placeholder="Ask a question about this document..."
+                autocomplete="off"
+                maxlength="300"
+            >
+            <button class="chat-send-btn" id="chatSendBtn" title="Send">
+                <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5">
+                    <line x1="22" y1="2" x2="11" y2="13"></line>
+                    <polygon points="22 2 15 22 11 13 2 9 22 2"></polygon>
+                </svg>
+            </button>
+        </div>
+    </div>
+
+    <script>
+    (function() {
+        const HISTORY_ID = {{ analysis.id }};
+        const fab      = document.getElementById('chatFab');
+        const panel    = document.getElementById('chatPanel');
+        const closeBtn = document.getElementById('chatCloseBtn');
+        const input    = document.getElementById('chatInput');
+        const sendBtn  = document.getElementById('chatSendBtn');
+        const messages = document.getElementById('chatMessages');
+        const suggsEl  = document.getElementById('chatSuggestions');
+
+        // Toggle panel
+        fab.addEventListener('click', () => {
+            panel.classList.toggle('chat-panel-open');
+            fab.classList.toggle('chat-fab-active');
+            if (panel.classList.contains('chat-panel-open')) {
+                setTimeout(() => input.focus(), 300);
+            }
+        });
+        closeBtn.addEventListener('click', () => {
+            panel.classList.remove('chat-panel-open');
+            fab.classList.remove('chat-fab-active');
+        });
+
+        // Chip suggestions
+        document.querySelectorAll('.chat-chip').forEach(chip => {
+            chip.addEventListener('click', () => {
+                input.value = chip.getAttribute('data-q');
+                sendMessage();
+            });
+        });
+
+        // Send on Enter
+        input.addEventListener('keydown', (e) => {
+            if (e.key === 'Enter' && !e.shiftKey) {
+                e.preventDefault();
+                sendMessage();
+            }
+        });
+        sendBtn.addEventListener('click', sendMessage);
+
+        function now() {
+            return new Date().toLocaleTimeString([], {hour: '2-digit', minute:'2-digit'});
+        }
+
+        function appendMsg(text, role, confidence) {
+            const isBot = role === 'bot';
+            const wrapper = document.createElement('div');
+            wrapper.className = `chat-msg ${isBot ? 'chat-msg-bot' : 'chat-msg-user'}`;
+
+            let badgeHtml = '';
+            if (isBot && confidence) {
+                const cls = confidence === 'high' ? 'conf-high' : confidence === 'medium' ? 'conf-med' : 'conf-low';
+                const label = confidence === 'high' ? '✓ High confidence' : confidence === 'medium' ? '~ Medium confidence' : '? Low confidence';
+                badgeHtml = `<span class="conf-badge ${cls}">${label}</span>`;
+            }
+
+            wrapper.innerHTML = `
+                <div class="chat-bubble ${isBot ? 'chat-bubble-bot' : 'chat-bubble-user'}">${escapeHtml(text)}</div>
+                <div class="chat-time">${isBot ? 'BriefIQ AI' : 'You'} · ${now()} ${badgeHtml}</div>
+            `;
+            messages.appendChild(wrapper);
+            messages.scrollTop = messages.scrollHeight;
+        }
+
+        function showTyping() {
+            const el = document.createElement('div');
+            el.className = 'chat-msg chat-msg-bot chat-typing-wrapper';
+            el.id = 'typingIndicator';
+            el.innerHTML = `
+                <div class="chat-bubble chat-bubble-bot chat-typing">
+                    <span></span><span></span><span></span>
+                </div>
+            `;
+            messages.appendChild(el);
+            messages.scrollTop = messages.scrollHeight;
+        }
+
+        function removeTyping() {
+            const el = document.getElementById('typingIndicator');
+            if (el) el.remove();
+        }
+
+        function escapeHtml(str) {
+            return str.replace(/&/g,'&amp;').replace(/</g,'&lt;').replace(/>/g,'&gt;').replace(/"/g,'&quot;');
+        }
+
+        async function sendMessage() {
+            const q = input.value.trim();
+            if (!q) return;
+            input.value = '';
+            sendBtn.disabled = true;
+            input.disabled = true;
+
+            // Hide suggestions after first question
+            if (suggsEl) suggsEl.style.display = 'none';
+
+            appendMsg(q, 'user');
+            showTyping();
+
+            try {
+                const res = await fetch(`/chat/${HISTORY_ID}`, {
+                    method: 'POST',
+                    headers: {'Content-Type': 'application/json'},
+                    body: JSON.stringify({question: q})
+                });
+                const data = await res.json();
+                removeTyping();
+                appendMsg(data.answer || 'Sorry, I could not find an answer.', 'bot', data.confidence);
+            } catch (err) {
+                removeTyping();
+                appendMsg('Network error. Please try again.', 'bot', 'low');
+            } finally {
+                sendBtn.disabled = false;
+                input.disabled = false;
+                input.focus();
+            }
+        }
+    })();
+    </script>
+    {% endif %}
+
+    <!-- Bottom Actions -->
+    <div style="text-align: center; margin-top: 30px;">
+        <a href="{{ url_for('home') }}" class="btn btn-primary btn-lg">
+            <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><line x1="12" y1="5" x2="12" y2="19"></line><line x1="5" y1="12" x2="19" y2="12"></line></svg>
+            Analyze Another Document
+        </a>
+    </div>
+
+</div>
+{% endblock %}
+
+
+{% block extra_scripts %}
+{% if is_table and chart_data %}
+<script>
+document.addEventListener('DOMContentLoaded', () => {
+    // Distribution Chart (Doughnut / Pie)
+    {% if chart_data.distribution %}
+    const distCtx = document.getElementById('distributionChart');
+    if (distCtx) {
+        new Chart(distCtx, {
+            type: "{{ chart_data.distribution.type or 'doughnut' }}",
+            data: {
+                labels: {{ chart_data.distribution.labels | tojson }},
+                datasets: [{
+                    data: {{ chart_data.distribution.data | tojson }},
+                    backgroundColor: [
+                        '#10b981', '#06b6d4', '#6366f1', '#a855f7', '#f59e0b', '#f43f5e', '#3b82f6'
+                    ],
+                    borderColor: '#0f172a',
+                    borderWidth: 2
+                }]
+            },
+            options: {
+                responsive: true,
+                maintainAspectRatio: false,
+                plugins: {
+                    legend: {
+                        position: 'bottom',
+                        labels: {
+                            color: '#94a3b8',
+                            font: { family: 'Inter', size: 12 }
+                        }
+                    }
+                }
+            }
+        });
+    }
+    {% endif %}
+
+    // Comparison Chart (Bar Chart)
+    {% if chart_data.comparison %}
+    const compCtx = document.getElementById('comparisonChart');
+    if (compCtx) {
+        new Chart(compCtx, {
+            type: 'bar',
+            data: {
+                labels: {{ chart_data.comparison.labels | tojson }},
+                datasets: [{
+                    label: 'Score / Value',
+                    data: {{ chart_data.comparison.data | tojson }},
+                    backgroundColor: 'rgba(99, 102, 241, 0.75)',
+                    borderColor: '#6366f1',
+                    borderWidth: 1.5,
+                    borderRadius: 6
+                }]
+            },
+            options: {
+                responsive: true,
+                maintainAspectRatio: false,
+                scales: {
+                    x: {
+                        ticks: { color: '#94a3b8', font: { family: 'Inter', size: 11 } },
+                        grid: { color: 'rgba(255, 255, 255, 0.05)' }
+                    },
+                    y: {
+                        ticks: { color: '#94a3b8', font: { family: 'Inter', size: 11 } },
+                        grid: { color: 'rgba(255, 255, 255, 0.05)' },
+                        beginAtZero: true
+                    }
+                },
+                plugins: {
+                    legend: { display: false }
+                }
+            }
+        });
+    }
+    {% endif %}
+});
+</script>
+{% endif %}
+{% endblock %}
