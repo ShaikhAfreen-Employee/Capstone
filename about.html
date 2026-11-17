@@ -1,0 +1,202 @@
+{% extends "base.html" %}
+
+{% block title %}About BriefIQ – AI Summary and Report Generator Using Deep Learning{% endblock %}
+
+{% block content %}
+<div class="container" style="padding-top: 20px; padding-bottom: 70px;">
+
+    <!-- About Hero -->
+    <div class="about-hero">
+        <div class="hero-pill">
+            <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5">
+                <circle cx="12" cy="12" r="10"></circle>
+                <line x1="12" y1="16" x2="12" y2="12"></line>
+                <line x1="12" y1="8" x2="12.01" y2="8"></line>
+            </svg>
+            System Architecture & Methodology
+        </div>
+        <h1 class="hero-title" style="font-size: 46px;">
+            About <span class="gradient-text">BriefIQ</span>
+        </h1>
+        <p class="hero-subtitle" style="max-width: 720px;">
+            AI Summary and Report Generator Using Deep Learning – Engineered to simplify document summarization and dataset analysis through cutting-edge neural models.
+        </p>
+    </div>
+
+    <!-- Overview Card -->
+    <div class="about-card">
+        <div class="summary-card-title" style="margin-bottom: 16px;">
+            <svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="var(--primary)" stroke-width="2.5">
+                <path d="M4 19.5A2.5 2.5 0 0 1 6.5 17H20"></path>
+                <path d="M6.5 2H20v20H6.5A2.5 2.5 0 0 1 4 19.5v-15A2.5 2.5 0 0 1 6.5 2z"></path>
+            </svg>
+            <span>Overview & Mission</span>
+        </div>
+        <p style="font-size: 15.5px; line-height: 1.8; color: #e2e8f0; margin-bottom: 18px;">
+            <strong>BriefIQ</strong> is a unified web-based application designed to bridge the gap between extensive textual information and dense structured numerical datasets. In today's digital era, researchers, educators, students, and corporate analysts are overwhelmed with voluminous PDF research papers, institutional textbooks, and multifaceted Excel spreadsheets.
+        </p>
+        <p style="font-size: 15.5px; line-height: 1.8; color: #cbd5e1;">
+            By integrating deep learning sequence-to-sequence transformers, optical text extraction engines, and automated exploratory data analysis, BriefIQ eliminates manual reading bottlenecks, slashes cognitive fatigue, and surfaces crucial insights in a fraction of a second.
+        </p>
+    </div>
+
+    <!-- Technical Architecture Grid -->
+    <div style="display: grid; grid-template-columns: 1fr 1fr; gap: 24px; margin-bottom: 30px;">
+        <div class="about-card" style="margin-bottom: 0;">
+            <div class="feature-icon-wrapper icon-purple" style="margin-bottom: 14px;">
+                <svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                    <polygon points="12 2 2 7 12 12 22 7 12 2"></polygon>
+                    <polyline points="2 17 12 22 22 17"></polyline>
+                    <polyline points="2 12 12 17 22 12"></polyline>
+                </svg>
+            </div>
+            <h3 style="font-size: 20px; font-weight: 700; margin-bottom: 10px;">T5 Deep Learning Model</h3>
+            <p style="font-size: 14px; color: var(--text-secondary); line-height: 1.6; margin-bottom: 12px;">
+                BriefIQ leverages Google's <strong>T5-small (Text-to-Text Transfer Transformer)</strong>. T5 reframes all NLP tasks into a unified text-to-text format, utilizing encoder-decoder self-attention to generate fluent, contextually accurate abstractive summaries rather than simply copying raw sentences.
+            </p>
+            <div class="format-tags" style="justify-content: flex-start;">
+                <span class="format-tag">HuggingFace Transformers</span>
+                <span class="format-tag">PyTorch Runtime</span>
+                <span class="format-tag">SentencePiece</span>
+            </div>
+        </div>
+
+        <div class="about-card" style="margin-bottom: 0;">
+            <div class="feature-icon-wrapper icon-emerald" style="margin-bottom: 14px;">
+                <svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                    <rect x="3" y="3" width="18" height="18" rx="2" ry="2"></rect>
+                    <line x1="3" y1="9" x2="21" y2="9"></line>
+                    <line x1="9" y1="21" x2="9" y2="9"></line>
+                </svg>
+            </div>
+            <h3 style="font-size: 20px; font-weight: 700; margin-bottom: 10px;">PyMuPDF & Pandas Engine</h3>
+            <p style="font-size: 14px; color: var(--text-secondary); line-height: 1.6; margin-bottom: 12px;">
+                Text extraction is powered by <strong>PyMuPDF (fitz)</strong>, capable of extracting text across hundreds of pages in milliseconds. Structured datasets from CSV, TSV, and Excel (XLSX, XLS) are parsed using <strong>Pandas</strong> and <strong>openpyxl</strong> to compute descriptive statistics, frequency counts, and anomalies.
+            </p>
+            <div class="format-tags" style="justify-content: flex-start;">
+                <span class="format-tag">PyMuPDF (fitz)</span>
+                <span class="format-tag">Pandas 2.2+</span>
+                <span class="format-tag">OpenPyXL</span>
+            </div>
+        </div>
+    </div>
+
+    <!-- Target Audience & Use Cases -->
+    <div class="about-card">
+        <div class="summary-card-title" style="margin-bottom: 20px;">
+            <svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="var(--accent-cyan)" stroke-width="2.5">
+                <path d="M17 21v-2a4 4 0 0 0-4-4H5a4 4 0 0 0-4 4v2"></path>
+                <circle cx="9" cy="7" r="4"></circle>
+                <path d="M23 21v-2a4 4 0 0 0-3-3.87"></path>
+                <path d="M16 3.13a4 4 0 0 1 0 7.75"></path>
+            </svg>
+            <span>Target Audiences & Practical Applications</span>
+        </div>
+
+        <div style="display: grid; grid-template-columns: repeat(auto-fit, minmax(240px, 1fr)); gap: 20px;">
+            <div style="background: rgba(255,255,255,0.02); padding: 20px; border-radius: var(--radius-md); border: 1px solid var(--border-subtle);">
+                <div style="font-size: 16px; font-weight: 700; color: #a5b4fc; margin-bottom: 6px;">🎓 Students</div>
+                <p style="font-size: 13.5px; color: var(--text-secondary);">
+                    Summarize multi-chapter textbooks, research publications, and thesis proposals in minutes to prepare for examinations and literature reviews.
+                </p>
+            </div>
+
+            <div style="background: rgba(255,255,255,0.02); padding: 20px; border-radius: var(--radius-md); border: 1px solid var(--border-subtle);">
+                <div style="font-size: 16px; font-weight: 700; color: #67e8f9; margin-bottom: 6px;">🔬 Researchers</div>
+                <p style="font-size: 13.5px; color: var(--text-secondary);">
+                    Extract core methodologies, experimental findings, and abstractive digests from scientific literature, keeping pace with domain innovations.
+                </p>
+            </div>
+
+            <div style="background: rgba(255,255,255,0.02); padding: 20px; border-radius: var(--radius-md); border: 1px solid var(--border-subtle);">
+                <div style="font-size: 16px; font-weight: 700; color: #6ee7b7; margin-bottom: 6px;">👨‍🏫 Teachers & Professors</div>
+                <p style="font-size: 13.5px; color: var(--text-secondary);">
+                    Upload cohort grade spreadsheets to instantly generate automated performance distributions and personalized advisory feedback for every student.
+                </p>
+            </div>
+
+            <div style="background: rgba(255,255,255,0.02); padding: 20px; border-radius: var(--radius-md); border: 1px solid var(--border-subtle);">
+                <div style="font-size: 16px; font-weight: 700; color: #fbbf24; margin-bottom: 6px;">💼 Professionals</div>
+                <p style="font-size: 13.5px; color: var(--text-secondary);">
+                    Convert business quarterly forecasts, financial reports, and strategic memos into high-impact executive summaries and presentation charts.
+                </p>
+            </div>
+        </div>
+    </div>
+
+    <!-- Comparative Analysis Matrix -->
+    <div class="about-card">
+        <div class="summary-card-title" style="margin-bottom: 12px;">
+            <svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="var(--accent-emerald)" stroke-width="2.5">
+                <polyline points="22 12 18 12 15 21 9 3 6 12 2 12"></polyline>
+            </svg>
+            <span>Manual Review vs. BriefIQ AI Intelligence</span>
+        </div>
+        <p style="font-size: 14px; margin-bottom: 20px;">Efficiency benchmarking between traditional workflow and BriefIQ neural summarization:</p>
+
+        <div style="overflow-x: auto;">
+            <table class="comparison-table">
+                <thead>
+                    <tr>
+                        <th>Capability / Metric</th>
+                        <th>Traditional Manual Process</th>
+                        <th style="color: var(--accent-cyan);">BriefIQ Deep Learning</th>
+                    </tr>
+                </thead>
+                <tbody>
+                    <tr>
+                        <td><b>20-Page Paper Review</b></td>
+                        <td>45 - 60 minutes</td>
+                        <td style="color: var(--accent-emerald); font-weight: 600;">2.5 - 4.0 seconds</td>
+                    </tr>
+                    <tr>
+                        <td><b>Summarization Style</b></td>
+                        <td>Manual highlight / Copy-paste</td>
+                        <td style="color: var(--accent-emerald); font-weight: 600;">Abstractive T5 Seq2Seq AI Synthesis</td>
+                    </tr>
+                    <tr>
+                        <td><b>Cohort Grade Analysis</b></td>
+                        <td>Manual formula writing in Excel</td>
+                        <td style="color: var(--accent-emerald); font-weight: 600;">1-Click Automated EDA & Advisories</td>
+                    </tr>
+                    <tr>
+                        <td><b>Data Visualization</b></td>
+                        <td>Manual chart building in spreadsheet</td>
+                        <td style="color: var(--accent-emerald); font-weight: 600;">Instant Chart.js Dynamic Visuals</td>
+                    </tr>
+                    <tr>
+                        <td><b>Export Capability</b></td>
+                        <td>Manual formatting & copy-paste</td>
+                        <td style="color: var(--accent-emerald); font-weight: 600;">High-Res Downloadable PDF Reports</td>
+                    </tr>
+                </tbody>
+            </table>
+        </div>
+    </div>
+
+    <!-- Future Roadmap -->
+    <div class="about-card">
+        <div class="summary-card-title" style="margin-bottom: 14px;">
+            <svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="var(--accent-purple)" stroke-width="2.5">
+                <polygon points="13 2 3 14 12 14 11 22 21 10 12 10 13 2"></polygon>
+            </svg>
+            <span>Future Enhancements & Technical Roadmap</span>
+        </div>
+        <div style="display: grid; grid-template-columns: repeat(auto-fit, minmax(220px, 1fr)); gap: 16px;">
+            <div class="feature-card" style="padding: 18px;">
+                <div style="font-weight: 700; font-size: 14px; color: #cbd5e1; margin-bottom: 6px;">🌍 Multilingual Summarization</div>
+                <p style="font-size: 13px; color: var(--text-secondary);">Cross-lingual ingestion and summarization across Spanish, French, German, Hindi, and Mandarin.</p>
+            </div>
+            <div class="feature-card" style="padding: 18px;">
+                <div style="font-weight: 700; font-size: 14px; color: #cbd5e1; margin-bottom: 6px;">📷 Scanned OCR Pipeline</div>
+                <p style="font-size: 13px; color: var(--text-secondary);">Tesseract and EasyOCR integration for handwritten notes and scanned document images.</p>
+            </div>
+            <div class="feature-card" style="padding: 18px;">
+                <div style="font-weight: 700; font-size: 14px; color: #cbd5e1; margin-bottom: 6px;">📊 Predictive Analytics</div>
+                <p style="font-size: 13px; color: var(--text-secondary);">Machine learning regression models to forecast student final examination grades.</p>
+            </div>
+        </div>
+    </div>
+
+</div>
+{% endblock %}
